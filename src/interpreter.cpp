@@ -14,6 +14,13 @@ int Interpreter::visit(ASTNode *node){
         }
         return result;
     }
+    if(IfNode *ifNode = dynamic_cast<IfNode*>(node)){
+        int condition = visit(ifNode->condition);
+        if(condition){
+            return visit(ifNode->body);
+        }
+        return 0;
+    }
     // Print Node
     if(PrintNode *printNode = dynamic_cast<PrintNode*>(node)){
         int value = visit(printNode->expr);

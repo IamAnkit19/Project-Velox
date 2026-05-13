@@ -14,6 +14,7 @@ private:
     ASTNode *expr(); // Handles addition/subtraction
     ASTNode *statement();
     ASTNode *comparison();
+    CompoundNode *block();
 
 public:
     Parser(Lexer l);

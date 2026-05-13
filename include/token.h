@@ -7,6 +7,7 @@ enum TokenType{
     // Keywords
     INT,
     PRINT,
+    IF,
 
     // Identifiers and Literals
     IDENTIFIER,
@@ -24,6 +25,8 @@ enum TokenType{
     SEMICOLON,
     LPAREN,
     RPAREN,
+    LBRACE,
+    RBRACE,
 
     GREATER,
     LESS,
@@ -54,6 +57,7 @@ struct Token{
         switch(type){
             case INT: return "INT";
             case PRINT: return "PRINT";
+            case IF: return "IF";
             case IDENTIFIER: return "IDENTIFIER";
             case NUMBER: return "NUMBER";
             case PLUS: return "PLUS";

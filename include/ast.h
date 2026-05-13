@@ -63,4 +63,14 @@ class PrintNode : public ASTNode{
     }
 };
 
+class IfNode : public ASTNode{
+    public:
+    ASTNode *condition;
+    CompoundNode *body;
+    IfNode(ASTNode *c, CompoundNode *b){
+        condition = c;
+        body = b;
+    }
+};
+
 #endif

@@ -106,6 +106,14 @@ ASTNode *Parser::comparison(){
 }
 
 ASTNode *Parser::statement(){
+    if(currentToken.type == IF){
+        eat(IF);
+        eat(LPAREN);
+        ASTNode *condition = comparison();
+        eat(RPAREN);
+        CompoundNode *body = block();
+        return new IfNode(condition, body);
+    }
     if(currentToken.type == INT){
         eat(INT);
         Token varToken = currentToken;
@@ -133,5 +141,15 @@ ASTNode *Parser::parse(){
     while(currentToken.type != EOF_TOKEN){
         compound->statements.push_back(statement());
     }
+    return compound;
+}
+
+CompoundNode *Parser::block(){
+    CompoundNode *compound = new CompoundNode();
+    eat(LBRACE);
+    while(currentToken.type != RBRACE){
+        compound->statements.push_back(statement());
+    }
+    eat(RBRACE);
     return compound;
 }
