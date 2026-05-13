@@ -69,6 +69,8 @@ struct Token{
             case SEMICOLON: return "SEMICOLON";
             case LPAREN: return "LPAREN";
             case RPAREN: return "RPAREN";
+            case LBRACE: return "LBRACE";
+            case RBRACE: return "RBRACE";
             case EOF_TOKEN: return "EOF_TOKEN";
             case GREATER: return "GREATER";
             case GREATER_EQUAL: return "GREATER_EQUAL";
