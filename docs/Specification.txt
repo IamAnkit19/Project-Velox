@@ -1,0 +1,50 @@
+Language Name: Velox
+
+Syntax:
+int x = 10;
+int y = 20;
+print(x + y);
+
+Data Types:
+- int
+
+Operators:
++ - * / %
+
+Rules:
+- Semicolon required
+- Case sensitive
+- Variable must start with a letter
+- Multiple statements allowed
+
+Expressions:
+- Supports parentheses ()
+- Standard precedence (*, / before +, -)
+
+Statements:
+- Variable declaration with assignment
+- Print statement
+
+Keywords:
+int, print
+
+
+
+Token Types:
+- INT, PRINT
+- IDENTIFIER
+- NUMBER
+- PLUS, MINUS, MULTIPLY, DIVIDE, MOD
+- ASSIGN, SEMICOLON, LPAREN, RPAREN
+- EOF
+
+Token Structure:
+- type
+- value
+
+Rules:
+- Keywords: int, print
+- Identifiers: start with letter, followed by letters/digits
+- Numbers: integers only
+- Ignore whitespace (space, tab, newline)
+- Error on unknown characters
