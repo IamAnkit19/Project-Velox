@@ -46,6 +46,9 @@ Token Lexer::identifier(){
     else if(result == "if"){
         return Token(IF, result);
     }
+    else if(result == "while"){
+        return Token(WHILE, result);
+    }
     return Token(IDENTIFIER, result);
 }
 

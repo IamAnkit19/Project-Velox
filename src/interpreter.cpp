@@ -1,6 +1,10 @@
 #include "interpreter.h"
 #include<iostream>
 
+Interpreter::Interpreter(){
+    scopes.push_back({});
+}
+
 int Interpreter::visit(ASTNode *node){
     // Number node
     if(NumberNode *num = dynamic_cast<NumberNode*>(node)){
@@ -14,10 +18,23 @@ int Interpreter::visit(ASTNode *node){
         }
         return result;
     }
+    // If Node
     if(IfNode *ifNode = dynamic_cast<IfNode*>(node)){
         int condition = visit(ifNode->condition);
         if(condition){
-            return visit(ifNode->body);
+            scopes.push_back({});
+            int result = visit(ifNode->body);
+            scopes.pop_back();
+            return result;
+        }
+        return 0;
+    }
+    // While Node
+    if(WhileNode *whileNode = dynamic_cast<WhileNode*>(node)){
+        while(visit(whileNode->condition)){
+            scopes.push_back({});
+            visit(whileNode->body);
+            scopes.pop_back();
         }
         return 0;
     }
@@ -30,13 +47,27 @@ int Interpreter::visit(ASTNode *node){
     // Variable Assignment
     if(VarAssignNode *assign = dynamic_cast<VarAssignNode*>(node)){
         int value = visit(assign->value);
-        variables[assign->varName] = value;
-        return value;
+        // Varibale declaration
+        if(assign->isDeclaration){
+            scopes.back()[assign->varName] = value;
+            return value;
+        }
+        // Variable Reassignment
+        for(int i=scopes.size()-1; i>=0; i--){
+            if(scopes[i].find(assign->varName) != scopes[i].end()){
+                scopes[i][assign->varName] = value;
+                return value;
+            }
+        }
+        std::cout<<"Varibale not declared: "<<assign->varName<<std::endl;
+        exit(1);
     }
     // Variable Access
     if(VariableNode *var = dynamic_cast<VariableNode*>(node)){
-        if(variables.find(var->name) != variables.end()){
-            return variables[var->name];
+        for(int i=scopes.size()-1; i>=0; i--){
+            if(scopes[i].find(var->name) != scopes[i].end()){
+                return scopes[i][var->name];
+            }
         }
         std::cout<<"Undefined Varibale: "<<var->name<<std::endl;
         exit(1);

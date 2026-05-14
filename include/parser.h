@@ -8,6 +8,7 @@ class Parser{
 private:
     Lexer lexer;
     Token currentToken;
+    Token nextToken;
     void eat(TokenType type);
     ASTNode *factor();
     ASTNode *term(); // Handles multiplication/division

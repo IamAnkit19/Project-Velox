@@ -8,6 +8,7 @@ enum TokenType{
     INT,
     PRINT,
     IF,
+    WHILE,
 
     // Identifiers and Literals
     IDENTIFIER,
@@ -58,6 +59,7 @@ struct Token{
             case INT: return "INT";
             case PRINT: return "PRINT";
             case IF: return "IF";
+            case WHILE: return "WHILE";
             case IDENTIFIER: return "IDENTIFIER";
             case NUMBER: return "NUMBER";
             case PLUS: return "PLUS";

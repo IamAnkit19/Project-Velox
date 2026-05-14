@@ -3,11 +3,13 @@
 
 Parser::Parser(Lexer l) : lexer(l){
     currentToken = lexer.getNextToken();
+    nextToken = lexer.getNextToken();
 }
 
 void Parser::eat(TokenType type){
     if(currentToken.type == type){
-        currentToken = lexer.getNextToken();
+        currentToken = nextToken;
+        nextToken = lexer.getNextToken();
     }
     else{
         std::cout<<"Syntax Error!"<<std::endl;
@@ -114,6 +116,14 @@ ASTNode *Parser::statement(){
         CompoundNode *body = block();
         return new IfNode(condition, body);
     }
+    if(currentToken.type == WHILE){
+        eat(WHILE);
+        eat(LPAREN);
+        ASTNode *condition = comparison();
+        eat(RPAREN);
+        CompoundNode *body = block();
+        return new WhileNode(condition, body);
+    }
     if(currentToken.type == INT){
         eat(INT);
         Token varToken = currentToken;
@@ -121,7 +131,7 @@ ASTNode *Parser::statement(){
         eat(ASSIGN);
         ASTNode *value = comparison();
         eat(SEMICOLON);
-        return new VarAssignNode(varToken.value, value);
+        return new VarAssignNode(varToken.value, value, true);
     }
     if(currentToken.type == PRINT){
         eat(PRINT);
@@ -130,6 +140,14 @@ ASTNode *Parser::statement(){
         eat(RPAREN);
         eat(SEMICOLON);
         return new PrintNode(expression);
+    }
+    if(currentToken.type == IDENTIFIER && nextToken.type == ASSIGN){
+        Token varToken = currentToken;
+        eat(IDENTIFIER);
+        eat(ASSIGN);
+        ASTNode *value = comparison();
+        eat(SEMICOLON);
+        return new VarAssignNode(varToken.value, value, false);
     }
     ASTNode *node = comparison();
     eat(SEMICOLON);

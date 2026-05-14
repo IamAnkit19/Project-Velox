@@ -41,9 +41,11 @@ class VarAssignNode : public ASTNode{
     public:
     std::string varName;
     ASTNode *value;
-    VarAssignNode(std::string n, ASTNode *v){
+    bool isDeclaration;
+    VarAssignNode(std::string n, ASTNode *v, bool decl){
         varName = n;
         value = v;
+        isDeclaration = decl;
     }
 };
 
@@ -68,6 +70,16 @@ class IfNode : public ASTNode{
     ASTNode *condition;
     CompoundNode *body;
     IfNode(ASTNode *c, CompoundNode *b){
+        condition = c;
+        body = b;
+    }
+};
+
+class WhileNode : public ASTNode{
+    public:
+    ASTNode *condition;
+    CompoundNode *body;
+    WhileNode(ASTNode *c, CompoundNode *b){
         condition = c;
         body = b;
     }

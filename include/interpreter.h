@@ -4,10 +4,12 @@
 #include "ast.h"
 #include<map>
 #include<string>
+#include<vector>
 
 class Interpreter{
 public:
-    std::map<std::string, int> variables;
+    std::vector<std::map<std::string, int>> scopes;
+    Interpreter();
     int visit(ASTNode *node);
 };
 
