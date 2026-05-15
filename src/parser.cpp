@@ -113,8 +113,18 @@ ASTNode *Parser::statement(){
         eat(LPAREN);
         ASTNode *condition = comparison();
         eat(RPAREN);
-        CompoundNode *body = block();
-        return new IfNode(condition, body);
+        CompoundNode *ifBody = block();
+        ASTNode *elseBody = nullptr;
+        if(currentToken.type == ELSE){
+            eat(ELSE);
+            if(currentToken.type == IF){
+                elseBody = statement();
+            }
+            else{
+                elseBody = block();
+            }
+        }
+        return new IfNode(condition, ifBody, elseBody);
     }
     if(currentToken.type == WHILE){
         eat(WHILE);

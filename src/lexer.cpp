@@ -33,7 +33,7 @@ void Lexer::skipWhitespace(){
 
 Token Lexer::identifier(){
     std::string result = "";
-    while(currentChar != '\0' && isalnum(currentChar)){
+    while(currentChar != '\0' && (isalnum(currentChar) || currentChar == '_')){
         result += currentChar;
         advance();
     }
@@ -45,6 +45,9 @@ Token Lexer::identifier(){
     }
     else if(result == "if"){
         return Token(IF, result);
+    }
+    else if(result == "else"){
+        return Token(ELSE, result);
     }
     else if(result == "while"){
         return Token(WHILE, result);

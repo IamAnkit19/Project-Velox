@@ -21,9 +21,17 @@ int Interpreter::visit(ASTNode *node){
     // If Node
     if(IfNode *ifNode = dynamic_cast<IfNode*>(node)){
         int condition = visit(ifNode->condition);
+        // If branch
         if(condition){
             scopes.push_back({});
-            int result = visit(ifNode->body);
+            int result = visit(ifNode->ifBody);
+            scopes.pop_back();
+            return result;
+        }
+        // Else branch
+        if(ifNode->elseBody != nullptr){
+            scopes.push_back({});
+            int result = visit(ifNode->elseBody);
             scopes.pop_back();
             return result;
         }
@@ -49,6 +57,10 @@ int Interpreter::visit(ASTNode *node){
         int value = visit(assign->value);
         // Varibale declaration
         if(assign->isDeclaration){
+            if(scopes.back().find(assign->varName) != scopes.back().end()){
+                std::cout<<"Variable already declared: "<<assign->varName<<std::endl;
+                exit(1);
+            }
             scopes.back()[assign->varName] = value;
             return value;
         }
