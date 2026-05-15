@@ -87,4 +87,14 @@ class WhileNode : public ASTNode{
     }
 };
 
+class UnaryOpNode : public ASTNode{
+    public:
+    TokenType op;
+    ASTNode *expr;
+    UnaryOpNode(TokenType o, ASTNode *e){
+        op = o;
+        expr = e;
+    }
+};
+
 #endif

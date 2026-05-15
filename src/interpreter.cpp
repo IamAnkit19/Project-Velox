@@ -84,6 +84,17 @@ int Interpreter::visit(ASTNode *node){
         std::cout<<"Undefined Varibale: "<<var->name<<std::endl;
         exit(1);
     }
+    // Unary Operation Node
+    if(UnaryOpNode *unary = dynamic_cast<UnaryOpNode*>(node)){
+        int value = visit(unary->expr);
+        switch(unary->op){
+            case NOT:
+                return !value;
+            default:
+                std::cout<<"Unknown Unary Operator!"<<std::endl;
+                exit(1);
+        }
+    }
     // Binary Operation node
     if(BinaryOpNode *binOp = dynamic_cast<BinaryOpNode*>(node)){
         int left = visit(binOp->left);
@@ -119,6 +130,10 @@ int Interpreter::visit(ASTNode *node){
                 return left == right;
             case NOT_EQUAL:
                 return left != right;
+            case AND_AND:
+                return left && right;
+            case OR_OR:
+                return left || right;
             default:
                 std::cout<<"Unknown operator!"<<std::endl;
                 exit(1);

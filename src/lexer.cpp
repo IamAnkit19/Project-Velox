@@ -151,8 +151,22 @@ Token Lexer::getNextToken(){
                 advance();
                 return Token(NOT_EQUAL, "!=");
             }
-            // Invalid
-            break;
+            advance();
+            return Token(NOT, "!");
+        }
+        if(currentChar == '&'){
+            if(peek() == '&'){
+                advance();
+                advance();
+                return Token(AND_AND, "&&");
+            }
+        }
+        if(currentChar == '|'){
+            if(peek() == '|'){
+                advance();
+                advance();
+                return Token(OR_OR, "||");
+            }
         }
 
         std::cout<<"Error: Invalid Character -> "<<currentChar<<std::endl;

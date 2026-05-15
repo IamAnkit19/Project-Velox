@@ -16,7 +16,8 @@ private:
     ASTNode *statement();
     ASTNode *comparison();
     CompoundNode *block();
-
+    ASTNode *logicalAND();
+    ASTNode *logicalOR();
 public:
     Parser(Lexer l);
     ASTNode *parse();

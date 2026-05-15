@@ -19,6 +19,11 @@ void Parser::eat(TokenType type){
 
 ASTNode *Parser::factor(){
     Token token = currentToken;
+    if(token.type == NOT){
+        eat(NOT);
+        ASTNode *node = factor();
+        return new UnaryOpNode(NOT, node);
+    }
     if(token.type == NUMBER){
         eat(NUMBER);
         return new NumberNode(token.value);
@@ -29,7 +34,7 @@ ASTNode *Parser::factor(){
     }
     else if(token.type == LPAREN){
         eat(LPAREN);
-        ASTNode *node = comparison();
+        ASTNode *node = logicalOR();
         eat(RPAREN);
         return node;
     }
@@ -111,7 +116,7 @@ ASTNode *Parser::statement(){
     if(currentToken.type == IF){
         eat(IF);
         eat(LPAREN);
-        ASTNode *condition = comparison();
+        ASTNode *condition = logicalOR();
         eat(RPAREN);
         CompoundNode *ifBody = block();
         ASTNode *elseBody = nullptr;
@@ -129,7 +134,7 @@ ASTNode *Parser::statement(){
     if(currentToken.type == WHILE){
         eat(WHILE);
         eat(LPAREN);
-        ASTNode *condition = comparison();
+        ASTNode *condition = logicalOR();
         eat(RPAREN);
         CompoundNode *body = block();
         return new WhileNode(condition, body);
@@ -139,14 +144,14 @@ ASTNode *Parser::statement(){
         Token varToken = currentToken;
         eat(IDENTIFIER);
         eat(ASSIGN);
-        ASTNode *value = comparison();
+        ASTNode *value = logicalOR();
         eat(SEMICOLON);
         return new VarAssignNode(varToken.value, value, true);
     }
     if(currentToken.type == PRINT){
         eat(PRINT);
         eat(LPAREN);
-        ASTNode *expression = comparison();
+        ASTNode *expression = logicalOR();
         eat(RPAREN);
         eat(SEMICOLON);
         return new PrintNode(expression);
@@ -155,13 +160,35 @@ ASTNode *Parser::statement(){
         Token varToken = currentToken;
         eat(IDENTIFIER);
         eat(ASSIGN);
-        ASTNode *value = comparison();
+        ASTNode *value = logicalOR();
         eat(SEMICOLON);
         return new VarAssignNode(varToken.value, value, false);
     }
-    ASTNode *node = comparison();
+    ASTNode *node = logicalOR();
     eat(SEMICOLON);
     return node;
+}
+
+ASTNode *Parser::logicalAND(){
+    ASTNode *left = comparison();
+    while(currentToken.type == AND_AND){
+        Token op = currentToken;
+        eat(AND_AND);
+        ASTNode *right = comparison();
+        left = new BinaryOpNode(left, op.type, right);
+    }
+    return left;
+}
+
+ASTNode *Parser::logicalOR(){
+    ASTNode *left = logicalAND();
+    while(currentToken.type == OR_OR){
+        Token op = currentToken;
+        eat(OR_OR);
+        ASTNode *right = logicalAND();
+        left = new BinaryOpNode(left, op.type, right);
+    }
+    return left;
 }
 
 ASTNode *Parser::parse(){

@@ -22,6 +22,10 @@ enum TokenType{
     DIVIDE,
     MOD,
 
+    AND_AND,
+    OR_OR,
+    NOT,
+
     // Symbols
     ASSIGN,
     SEMICOLON,
@@ -69,6 +73,9 @@ struct Token{
             case MULTIPLY: return "MULTIPLY";
             case DIVIDE: return "DIVIDE";
             case MOD: return "MOD";
+            case AND_AND: return "AND_AND";
+            case OR_OR: return "OR_OR";
+            case NOT: return "NOT";
             case ASSIGN: return "ASSIGN";
             case SEMICOLON: return "SEMICOLON";
             case LPAREN: return "LPAREN";
