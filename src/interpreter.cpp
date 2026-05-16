@@ -21,6 +21,11 @@ int Interpreter::visit(ASTNode *node){
         }
         return result;
     }
+    // Function Definition
+    if(FunctionDefNode *func = dynamic_cast<FunctionDefNode*>(node)){
+        functions[func->name] = func;
+        return 0;
+    }
     // If Node
     if(IfNode *ifNode = dynamic_cast<IfNode*>(node)){
         int condition = visit(ifNode->condition);
@@ -90,6 +95,32 @@ int Interpreter::visit(ASTNode *node){
         int value = visit(printNode->expr);
         std::cout<<value<<'\n';
         return value;
+    }
+    // Function Call
+    if(FunctionCallNode *call = dynamic_cast<FunctionCallNode*>(node)){
+        if(functions.find(call->name) == functions.end()){
+            std::cout<<"Undefinded Function: "<<call->name<<std::endl;
+            exit(1);
+        }
+        FunctionDefNode *func = functions[call->name];
+        // Argument count check
+        if(call->arguments.size() != func->params.size()){
+            std::cout<<"Arguments count mismatch!"<<std::endl;
+            exit(1);
+        }
+        scopes.push_back({});
+        for(int i=0; i<func->params.size(); i++){
+            int value = visit(call->arguments[i]);
+            scopes.back()[func->params[i]] = value;
+        }
+        returnFlag = false;
+        returnValue = 0;
+        visit(func->body);
+        int result = returnValue;
+        returnFlag = false;
+        returnValue = 0;
+        scopes.pop_back();
+        return result;
     }
     // Variable Assignment
     if(VarAssignNode *assign = dynamic_cast<VarAssignNode*>(node)){

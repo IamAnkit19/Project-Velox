@@ -14,6 +14,7 @@ enum TokenType{
     BREAK,
     CONTINUE,
     RETURN,
+    FUNC,
 
     // Identifiers and Literals
     IDENTIFIER,
@@ -37,6 +38,7 @@ enum TokenType{
     RPAREN,
     LBRACE,
     RBRACE,
+    COMMA,
 
     GREATER,
     LESS,
@@ -74,6 +76,7 @@ struct Token{
             case BREAK: return "BREAK";
             case RETURN: return "RETURN";
             case CONTINUE: return "CONTINUE";
+            case FUNC: return "FUNC";
             case IDENTIFIER: return "IDENTIFIER";
             case NUMBER: return "NUMBER";
             case PLUS: return "PLUS";
@@ -90,6 +93,7 @@ struct Token{
             case RPAREN: return "RPAREN";
             case LBRACE: return "LBRACE";
             case RBRACE: return "RBRACE";
+            case COMMA: return "COMMA";
             case EOF_TOKEN: return "EOF_TOKEN";
             case GREATER: return "GREATER";
             case GREATER_EQUAL: return "GREATER_EQUAL";

@@ -13,6 +13,7 @@ public:
     bool returnFlag = false;
     int returnValue = 0;
     std::vector<std::map<std::string, int>> scopes;
+    std::map<std::string, FunctionDefNode*> functions;
     Interpreter();
     int visit(ASTNode *node);
 };

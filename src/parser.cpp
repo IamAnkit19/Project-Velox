@@ -29,6 +29,23 @@ ASTNode *Parser::factor(){
         return new NumberNode(token.value);
     }
     else if(token.type == IDENTIFIER){
+        // Function call
+        if(nextToken.type == LPAREN){
+            std::string funcName = token.value;
+            eat(IDENTIFIER);
+            eat(LPAREN);
+            std::vector<ASTNode*> arguments;
+            if(currentToken.type != RPAREN){
+                arguments.push_back(logicalOR());
+                while(currentToken.type == COMMA){
+                    eat(COMMA);
+                    arguments.push_back(logicalOR());
+                }
+            }
+            eat(RPAREN);
+            return new FunctionCallNode(funcName, arguments);
+        }
+        // Variable access
         eat(IDENTIFIER);
         return new VariableNode(token.value);
     }
@@ -113,6 +130,25 @@ ASTNode *Parser::comparison(){
 }
 
 ASTNode *Parser::statement(){
+    if(currentToken.type == FUNC){
+        eat(FUNC);
+        Token funcName = currentToken;
+        eat(IDENTIFIER);
+        eat(LPAREN);
+        std::vector<std::string> params;
+        if(currentToken.type != RPAREN){
+            params.push_back(currentToken.value);
+            eat(IDENTIFIER);
+            while(currentToken.type == COMMA){
+                eat(COMMA);
+                params.push_back(currentToken.value);
+                eat(IDENTIFIER);
+            }
+        }
+        eat(RPAREN);
+        CompoundNode *body = block();
+        return new FunctionDefNode(funcName.value, params, body);
+    }
     if(currentToken.type == IF){
         eat(IF);
         eat(LPAREN);

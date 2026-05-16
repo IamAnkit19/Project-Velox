@@ -64,6 +64,9 @@ Token Lexer::identifier(){
     else if(result == "return"){
         return Token(RETURN, result);
     }
+    else if(result == "func"){
+        return Token(FUNC, result);
+    }
     return Token(IDENTIFIER, result);
 }
 
@@ -138,6 +141,10 @@ Token Lexer::getNextToken(){
         if(currentChar == '}'){
             advance();
             return Token(RBRACE, "}");
+        }
+        if(currentChar == ','){
+            advance();
+            return Token(COMMA, ",");
         }
         if(currentChar == '>'){
             if(peek() == '='){

@@ -101,6 +101,28 @@ class ForNode : public ASTNode{
     }
 };
 
+class FunctionDefNode : public ASTNode{
+    public:
+    std::string name;
+    std::vector<std::string> params;
+    CompoundNode *body;
+    FunctionDefNode(std::string n, std::vector<std::string> p, CompoundNode *b){
+        name = n;
+        params = p;
+        body = b;
+    }
+};
+
+class FunctionCallNode : public ASTNode{
+    public:
+    std::string name;
+    std::vector<ASTNode*> arguments;
+    FunctionCallNode(std::string n, std::vector<ASTNode*> args){
+        name = n;
+        arguments = args;
+    }
+};
+
 class UnaryOpNode : public ASTNode{
     public:
     TokenType op;
