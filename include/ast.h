@@ -87,6 +87,20 @@ class WhileNode : public ASTNode{
     }
 };
 
+class ForNode : public ASTNode{
+    public:
+    ASTNode *init;
+    ASTNode *condition;
+    ASTNode *update;
+    CompoundNode *body;
+    ForNode(ASTNode *i, ASTNode *c, ASTNode *u, CompoundNode *b){
+        init = i;
+        condition = c;
+        update = u;
+        body = b;
+    }
+};
+
 class UnaryOpNode : public ASTNode{
     public:
     TokenType op;
@@ -95,6 +109,12 @@ class UnaryOpNode : public ASTNode{
         op = o;
         expr = e;
     }
+};
+
+class BreakNode : public ASTNode{
+};
+
+class ContinueNode : public ASTNode{
 };
 
 #endif

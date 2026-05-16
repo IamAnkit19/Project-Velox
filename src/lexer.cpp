@@ -52,6 +52,15 @@ Token Lexer::identifier(){
     else if(result == "while"){
         return Token(WHILE, result);
     }
+    else if(result == "for"){
+        return Token(FOR, result);
+    }
+    else if(result == "break"){
+        return Token(BREAK, result);
+    }
+    else if(result == "continue"){
+        return Token(CONTINUE, result);
+    }
     return Token(IDENTIFIER, result);
 }
 

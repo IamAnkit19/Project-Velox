@@ -8,6 +8,8 @@
 
 class Interpreter{
 public:
+    bool breakFlag = false;
+    bool continueFlag = false;
     std::vector<std::map<std::string, int>> scopes;
     Interpreter();
     int visit(ASTNode *node);

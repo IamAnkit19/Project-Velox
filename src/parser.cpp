@@ -131,6 +131,17 @@ ASTNode *Parser::statement(){
         }
         return new IfNode(condition, ifBody, elseBody);
     }
+    if(currentToken.type == FOR){
+        eat(FOR);
+        eat(LPAREN);
+        ASTNode *init = statement();
+        ASTNode *condition = logicalOR();
+        eat(SEMICOLON);
+        ASTNode *update = statement();
+        eat(RPAREN);
+        CompoundNode *body = block();
+        return new ForNode(init, condition, update, body);
+    }
     if(currentToken.type == WHILE){
         eat(WHILE);
         eat(LPAREN);
@@ -138,6 +149,16 @@ ASTNode *Parser::statement(){
         eat(RPAREN);
         CompoundNode *body = block();
         return new WhileNode(condition, body);
+    }
+    if(currentToken.type == BREAK){
+        eat(BREAK);
+        eat(SEMICOLON);
+        return new BreakNode();
+    }
+    if(currentToken.type == CONTINUE){
+        eat(CONTINUE);
+        eat(SEMICOLON);
+        return new ContinueNode();
     }
     if(currentToken.type == INT){
         eat(INT);

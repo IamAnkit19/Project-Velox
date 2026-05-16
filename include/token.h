@@ -10,6 +10,9 @@ enum TokenType{
     IF,
     WHILE,
     ELSE,
+    FOR,
+    BREAK,
+    CONTINUE,
 
     // Identifiers and Literals
     IDENTIFIER,
@@ -66,6 +69,9 @@ struct Token{
             case IF: return "IF";
             case WHILE: return "WHILE";
             case ELSE: return "ELSE";
+            case FOR: return "FOR";
+            case BREAK: return "BREAK";
+            case CONTINUE: return "CONTINUE";
             case IDENTIFIER: return "IDENTIFIER";
             case NUMBER: return "NUMBER";
             case PLUS: return "PLUS";

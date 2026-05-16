@@ -15,6 +15,9 @@ int Interpreter::visit(ASTNode *node){
         int result = 0;
         for(ASTNode *stmt : compound->statements){
             result = visit(stmt);
+            if(breakFlag || continueFlag){
+                return result;
+            }
         }
         return result;
     }
@@ -37,12 +40,40 @@ int Interpreter::visit(ASTNode *node){
         }
         return 0;
     }
+    // For Node
+    if(ForNode *forNode = dynamic_cast<ForNode*>(node)){
+        scopes.push_back({});
+        visit(forNode->init);
+        while(visit(forNode->condition)){
+            visit(forNode->body);
+            if(breakFlag){
+                breakFlag = false;
+                break;
+            }
+            if(continueFlag){
+                continueFlag = false;
+                visit(forNode->update);
+                continue;
+            }
+            visit(forNode->update);
+        }
+        scopes.pop_back();
+        return 0;
+    }
     // While Node
     if(WhileNode *whileNode = dynamic_cast<WhileNode*>(node)){
         while(visit(whileNode->condition)){
             scopes.push_back({});
             visit(whileNode->body);
             scopes.pop_back();
+            if(breakFlag){
+                breakFlag = false;
+                break;
+            }
+            if(continueFlag){
+                continueFlag = false;
+                continue;
+            }
         }
         return 0;
     }
@@ -94,6 +125,16 @@ int Interpreter::visit(ASTNode *node){
                 std::cout<<"Unknown Unary Operator!"<<std::endl;
                 exit(1);
         }
+    }
+    // Break node
+    if(dynamic_cast<BreakNode*>(node)){
+        breakFlag = true;
+        return 0;
+    }
+    // Continue Node
+    if(dynamic_cast<ContinueNode*>(node)){
+        continueFlag = true;
+        return 0;
     }
     // Binary Operation node
     if(BinaryOpNode *binOp = dynamic_cast<BinaryOpNode*>(node)){
