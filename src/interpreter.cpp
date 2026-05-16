@@ -15,7 +15,7 @@ int Interpreter::visit(ASTNode *node){
         int result = 0;
         for(ASTNode *stmt : compound->statements){
             result = visit(stmt);
-            if(breakFlag || continueFlag){
+            if(breakFlag || continueFlag || returnFlag){
                 return result;
             }
         }
@@ -46,6 +46,10 @@ int Interpreter::visit(ASTNode *node){
         visit(forNode->init);
         while(visit(forNode->condition)){
             visit(forNode->body);
+            if(returnFlag){
+                scopes.pop_back();
+                return returnValue;
+            }
             if(breakFlag){
                 breakFlag = false;
                 break;
@@ -65,6 +69,10 @@ int Interpreter::visit(ASTNode *node){
         while(visit(whileNode->condition)){
             scopes.push_back({});
             visit(whileNode->body);
+            if(returnFlag){
+                scopes.pop_back();
+                return returnValue;
+            }
             scopes.pop_back();
             if(breakFlag){
                 breakFlag = false;
@@ -135,6 +143,12 @@ int Interpreter::visit(ASTNode *node){
     if(dynamic_cast<ContinueNode*>(node)){
         continueFlag = true;
         return 0;
+    }
+    // Return node
+    if(ReturnNode *returnNode = dynamic_cast<ReturnNode*>(node)){
+        returnValue = visit(returnNode->value);
+        returnFlag = true;
+        return returnValue;
     }
     // Binary Operation node
     if(BinaryOpNode *binOp = dynamic_cast<BinaryOpNode*>(node)){

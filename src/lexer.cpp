@@ -61,6 +61,9 @@ Token Lexer::identifier(){
     else if(result == "continue"){
         return Token(CONTINUE, result);
     }
+    else if(result == "return"){
+        return Token(RETURN, result);
+    }
     return Token(IDENTIFIER, result);
 }
 

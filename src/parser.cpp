@@ -160,6 +160,12 @@ ASTNode *Parser::statement(){
         eat(SEMICOLON);
         return new ContinueNode();
     }
+    if(currentToken.type == RETURN){
+        eat(RETURN);
+        ASTNode *value = logicalOR();
+        eat(SEMICOLON);
+        return new ReturnNode(value);
+    }
     if(currentToken.type == INT){
         eat(INT);
         Token varToken = currentToken;

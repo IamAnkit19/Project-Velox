@@ -117,4 +117,12 @@ class BreakNode : public ASTNode{
 class ContinueNode : public ASTNode{
 };
 
+class ReturnNode : public ASTNode{
+    public:
+    ASTNode *value;
+    ReturnNode(ASTNode *v){
+        value = v;
+    }
+};
+
 #endif
