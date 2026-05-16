@@ -188,7 +188,7 @@ Token Lexer::getNextToken(){
             }
         }
 
-        std::cout<<"Error: Invalid Character -> "<<currentChar<<std::endl;
+        std::cerr<<"Error: Invalid Character -> "<<currentChar<<std::endl;
         exit(1);
     }
     return Token(EOF_TOKEN, "");

@@ -12,7 +12,7 @@ void Parser::eat(TokenType type){
         nextToken = lexer.getNextToken();
     }
     else{
-        std::cout<<"Syntax Error!"<<std::endl;
+        std::cerr<<"Syntax Error!"<<std::endl;
         exit(1);
     }
 }
@@ -55,7 +55,7 @@ ASTNode *Parser::factor(){
         eat(RPAREN);
         return node;
     }
-    std::cout<<"Invalid factor!"<<std::endl;
+    std::cerr<<"Invalid factor!"<<std::endl;
     exit(1);
 }
 

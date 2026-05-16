@@ -99,13 +99,13 @@ int Interpreter::visit(ASTNode *node){
     // Function Call
     if(FunctionCallNode *call = dynamic_cast<FunctionCallNode*>(node)){
         if(functions.find(call->name) == functions.end()){
-            std::cout<<"Undefinded Function: "<<call->name<<std::endl;
+            std::cerr<<"Undefinded Function: "<<call->name<<std::endl;
             exit(1);
         }
         FunctionDefNode *func = functions[call->name];
         // Argument count check
         if(call->arguments.size() != func->params.size()){
-            std::cout<<"Arguments count mismatch!"<<std::endl;
+            std::cerr<<"Arguments count mismatch!"<<std::endl;
             exit(1);
         }
         scopes.push_back({});
@@ -128,7 +128,7 @@ int Interpreter::visit(ASTNode *node){
         // Varibale declaration
         if(assign->isDeclaration){
             if(scopes.back().find(assign->varName) != scopes.back().end()){
-                std::cout<<"Variable already declared: "<<assign->varName<<std::endl;
+                std::cerr<<"Variable already declared: "<<assign->varName<<std::endl;
                 exit(1);
             }
             scopes.back()[assign->varName] = value;
@@ -141,7 +141,7 @@ int Interpreter::visit(ASTNode *node){
                 return value;
             }
         }
-        std::cout<<"Varibale not declared: "<<assign->varName<<std::endl;
+        std::cerr<<"Varibale not declared: "<<assign->varName<<std::endl;
         exit(1);
     }
     // Variable Access
@@ -151,7 +151,7 @@ int Interpreter::visit(ASTNode *node){
                 return scopes[i][var->name];
             }
         }
-        std::cout<<"Undefined Varibale: "<<var->name<<std::endl;
+        std::cerr<<"Undefined Varibale: "<<var->name<<std::endl;
         exit(1);
     }
     // Unary Operation Node
@@ -161,7 +161,7 @@ int Interpreter::visit(ASTNode *node){
             case NOT:
                 return !value;
             default:
-                std::cout<<"Unknown Unary Operator!"<<std::endl;
+                std::cerr<<"Unknown Unary Operator!"<<std::endl;
                 exit(1);
         }
     }
@@ -194,13 +194,13 @@ int Interpreter::visit(ASTNode *node){
                 return left * right;
             case DIVIDE:
                 if(right == 0){
-                    std::cout<<"Division By Zero!"<<std::endl;
+                    std::cerr<<"Division By Zero!"<<std::endl;
                     exit(1);
                 }
                 return left / right;
             case MOD:
                 if(right == 0){
-                    std::cout<<"Modulo By Zero!"<<std::endl;
+                    std::cerr<<"Modulo By Zero!"<<std::endl;
                     exit(1);
                 }
                 return left % right;
@@ -221,10 +221,10 @@ int Interpreter::visit(ASTNode *node){
             case OR_OR:
                 return left || right;
             default:
-                std::cout<<"Unknown operator!"<<std::endl;
+                std::cerr<<"Unknown operator!"<<std::endl;
                 exit(1);
         }
     }
-    std::cout<<"Invalid AST Node!"<<std::endl;
+    std::cerr<<"Invalid AST Node!"<<std::endl;
     exit(1);
 }
