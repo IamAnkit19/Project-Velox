@@ -18,6 +18,14 @@ class NumberNode : public ASTNode{
     }
 };
 
+class StringNode : public ASTNode{
+    public:
+    std::string value;
+    StringNode(std::string v){
+        value = v;
+    }
+};
+
 class VariableNode : public ASTNode{
     public:
     std::string name;

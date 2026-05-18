@@ -2,6 +2,7 @@
 #define INTERPRETER_H
 
 #include "ast.h"
+#include "value.h"
 #include<map>
 #include<string>
 #include<vector>
@@ -11,11 +12,11 @@ public:
     bool breakFlag = false;
     bool continueFlag = false;
     bool returnFlag = false;
-    int returnValue = 0;
-    std::vector<std::map<std::string, int>> scopes;
+    Value returnValue = Value(0);
+    std::vector<std::map<std::string, Value>> scopes;
     std::map<std::string, FunctionDefNode*> functions;
     Interpreter();
-    int visit(ASTNode *node);
+    Value visit(ASTNode *node);
 };
 
 #endif

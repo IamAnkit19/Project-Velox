@@ -79,6 +79,21 @@ Token Lexer::number(){
     return Token(NUMBER, result);
 }
 
+Token Lexer::string(){
+    std::string result = "";
+    advance();
+    while(currentChar != '"' && currentChar != '\0'){
+        result += currentChar;
+        advance();
+    }
+    if(currentChar == '\0'){
+        std::cerr<<"Unterminated string!"<<std::endl;
+        exit(1);
+    }
+    advance();
+    return Token(STRING, result);
+}
+
 Token Lexer::getNextToken(){
     while(currentChar != '\0'){
         if(currentChar == ' ' || currentChar == '\t' || currentChar == '\n'){
@@ -90,6 +105,9 @@ Token Lexer::getNextToken(){
         }
         if(isdigit(currentChar)){
             return number();
+        }
+        if(currentChar == '"'){
+            return string();
         }
         
         if(currentChar == '+'){

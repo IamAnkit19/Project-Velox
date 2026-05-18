@@ -24,6 +24,9 @@ public:
     // Read Number
     Token number();
 
+    // Read String
+    Token string();
+
     // Main function to get next token
     Token getNextToken();
 

@@ -28,6 +28,10 @@ ASTNode *Parser::factor(){
         eat(NUMBER);
         return new NumberNode(token.value);
     }
+    else if(token.type == STRING){
+        eat(STRING);
+        return new StringNode(token.value);
+    }
     else if(token.type == IDENTIFIER){
         // Function call
         if(nextToken.type == LPAREN){

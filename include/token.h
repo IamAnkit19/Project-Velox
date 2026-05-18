@@ -15,10 +15,11 @@ enum TokenType{
     CONTINUE,
     RETURN,
     FUNC,
-
+    
     // Identifiers and Literals
     IDENTIFIER,
     NUMBER,
+    STRING,
 
     // Operators
     PLUS,
@@ -79,6 +80,7 @@ struct Token{
             case FUNC: return "FUNC";
             case IDENTIFIER: return "IDENTIFIER";
             case NUMBER: return "NUMBER";
+            case STRING: return "STRING";
             case PLUS: return "PLUS";
             case MINUS: return "MINUS";
             case MULTIPLY: return "MULTIPLY";

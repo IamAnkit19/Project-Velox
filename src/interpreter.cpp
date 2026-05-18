@@ -5,14 +5,18 @@ Interpreter::Interpreter(){
     scopes.push_back({});
 }
 
-int Interpreter::visit(ASTNode *node){
+Value Interpreter::visit(ASTNode *node){
     // Number node
     if(NumberNode *num = dynamic_cast<NumberNode*>(node)){
-        return std::stoi(num->value);
+        return Value(std::stoi(num->value));
+    }
+    // String Node
+    if(StringNode *str = dynamic_cast<StringNode*>(node)){
+        return Value(str->value);
     }
     // Compound Node
     if(CompoundNode *compound = dynamic_cast<CompoundNode*>(node)){
-        int result = 0;
+        Value result = Value(0);
         for(ASTNode *stmt : compound->statements){
             result = visit(stmt);
             if(breakFlag || continueFlag || returnFlag){
@@ -24,33 +28,47 @@ int Interpreter::visit(ASTNode *node){
     // Function Definition
     if(FunctionDefNode *func = dynamic_cast<FunctionDefNode*>(node)){
         functions[func->name] = func;
-        return 0;
+        return Value(0);
     }
     // If Node
     if(IfNode *ifNode = dynamic_cast<IfNode*>(node)){
-        int condition = visit(ifNode->condition);
+        Value condition = visit(ifNode->condition);
+        if(condition.type != Value::INT){
+            std::cerr<<"Condition must be integer!"<<std::endl;
+            exit(1);
+        }
         // If branch
-        if(condition){
+        if(condition.intValue){
             scopes.push_back({});
-            int result = visit(ifNode->ifBody);
+            Value result = visit(ifNode->ifBody);
             scopes.pop_back();
             return result;
         }
         // Else branch
         if(ifNode->elseBody != nullptr){
             scopes.push_back({});
-            int result = visit(ifNode->elseBody);
+            Value result = visit(ifNode->elseBody);
             scopes.pop_back();
             return result;
         }
-        return 0;
+        return Value(0);
     }
     // For Node
     if(ForNode *forNode = dynamic_cast<ForNode*>(node)){
         scopes.push_back({});
         visit(forNode->init);
-        while(visit(forNode->condition)){
+        while(true){
+            Value condition = visit(forNode->condition);
+            if(condition.type != Value::INT){
+                std::cerr<<"Condition must be integer!"<<std::endl;
+                exit(1);
+            }
+            if(!condition.intValue){
+                break;
+            }
+            scopes.push_back({});
             visit(forNode->body);
+            scopes.pop_back();
             if(returnFlag){
                 scopes.pop_back();
                 return returnValue;
@@ -67,18 +85,25 @@ int Interpreter::visit(ASTNode *node){
             visit(forNode->update);
         }
         scopes.pop_back();
-        return 0;
+        return Value(0);
     }
     // While Node
     if(WhileNode *whileNode = dynamic_cast<WhileNode*>(node)){
-        while(visit(whileNode->condition)){
+        while(true){
+            Value condition = visit(whileNode->condition);
+            if(condition.type != Value::INT){
+                std::cerr<<"Condition must be integer!"<<std::endl;
+                exit(1);
+            }
+            if(!condition.intValue){
+                break;
+            }
             scopes.push_back({});
             visit(whileNode->body);
+            scopes.pop_back();
             if(returnFlag){
-                scopes.pop_back();
                 return returnValue;
             }
-            scopes.pop_back();
             if(breakFlag){
                 breakFlag = false;
                 break;
@@ -88,12 +113,17 @@ int Interpreter::visit(ASTNode *node){
                 continue;
             }
         }
-        return 0;
+        return Value(0);
     }
     // Print Node
     if(PrintNode *printNode = dynamic_cast<PrintNode*>(node)){
-        int value = visit(printNode->expr);
-        std::cout<<value<<'\n';
+        Value value = visit(printNode->expr);
+        if(value.type == Value::INT){
+            std::cout<<value.intValue<<'\n';
+        }
+        else if(value.type == Value::STRING){
+            std::cout<<value.stringValue<<'\n';
+        }
         return value;
     }
     // Function Call
@@ -110,21 +140,21 @@ int Interpreter::visit(ASTNode *node){
         }
         scopes.push_back({});
         for(int i=0; i<func->params.size(); i++){
-            int value = visit(call->arguments[i]);
+            Value value = visit(call->arguments[i]);
             scopes.back()[func->params[i]] = value;
         }
         returnFlag = false;
-        returnValue = 0;
+        returnValue = Value(0);
         visit(func->body);
-        int result = returnValue;
+        Value result = returnValue;
         returnFlag = false;
-        returnValue = 0;
+        returnValue = Value(0);
         scopes.pop_back();
         return result;
     }
     // Variable Assignment
     if(VarAssignNode *assign = dynamic_cast<VarAssignNode*>(node)){
-        int value = visit(assign->value);
+        Value value = visit(assign->value);
         // Varibale declaration
         if(assign->isDeclaration){
             if(scopes.back().find(assign->varName) != scopes.back().end()){
@@ -156,10 +186,14 @@ int Interpreter::visit(ASTNode *node){
     }
     // Unary Operation Node
     if(UnaryOpNode *unary = dynamic_cast<UnaryOpNode*>(node)){
-        int value = visit(unary->expr);
+        Value value = visit(unary->expr);
         switch(unary->op){
             case NOT:
-                return !value;
+                if(value.type != Value::INT){
+                    std::cerr<<"Invalid operand for !"<<std::endl;
+                    exit(1);
+                }
+                return Value(!value.intValue);
             default:
                 std::cerr<<"Unknown Unary Operator!"<<std::endl;
                 exit(1);
@@ -168,12 +202,12 @@ int Interpreter::visit(ASTNode *node){
     // Break node
     if(dynamic_cast<BreakNode*>(node)){
         breakFlag = true;
-        return 0;
+        return Value(0);
     }
     // Continue Node
     if(dynamic_cast<ContinueNode*>(node)){
         continueFlag = true;
-        return 0;
+        return Value(0);
     }
     // Return node
     if(ReturnNode *returnNode = dynamic_cast<ReturnNode*>(node)){
@@ -183,43 +217,104 @@ int Interpreter::visit(ASTNode *node){
     }
     // Binary Operation node
     if(BinaryOpNode *binOp = dynamic_cast<BinaryOpNode*>(node)){
-        int left = visit(binOp->left);
-        int right = visit(binOp->right);
+        Value left = visit(binOp->left);
+        Value right = visit(binOp->right);
         switch(binOp->op){
             case PLUS:
-                return left + right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue + right.intValue);
+                }
+                if(left.type == Value::STRING && right.type == Value::STRING){
+                    return Value(left.stringValue + right.stringValue);
+                }
+                std::cerr<<"Invalid operands for +"<<std::endl;
+                exit(1);
             case MINUS:
-                return left - right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue - right.intValue);
+                }
+                std::cerr<<"Invalid operands for -"<<std::endl;
+                exit(1);
             case MULTIPLY:
-                return left * right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue * right.intValue);
+                }
+                std::cerr<<"Invalid operands for *"<<std::endl;
+                exit(1);
             case DIVIDE:
-                if(right == 0){
-                    std::cerr<<"Division By Zero!"<<std::endl;
-                    exit(1);
+                if(left.type == Value::INT && right.type == Value::INT){
+                    if(right.intValue == 0){
+                        std::cerr<<"Division By Zero!"<<std::endl;
+                        exit(1);
+                    }
+                    return Value(left.intValue / right.intValue);
                 }
-                return left / right;
+                std::cerr<<"Invalid operands for /"<<std::endl;
+                exit(1);
             case MOD:
-                if(right == 0){
-                    std::cerr<<"Modulo By Zero!"<<std::endl;
-                    exit(1);
+                if(left.type == Value::INT && right.type == Value::INT){
+                    if(right.intValue == 0){
+                        std::cerr<<"Modulo By Zero!"<<std::endl;
+                        exit(1);
+                    }
+                    return Value(left.intValue % right.intValue);
                 }
-                return left % right;
+                std::cerr<<"Invalid operands for %"<<std::endl;
+                exit(1);
             case GREATER:
-                return left > right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue > right.intValue);
+                }
+                std::cerr<<"Invalid operands for >"<<std::endl;
+                exit(1);
             case LESS:
-                return left < right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue < right.intValue);
+                }
+                std::cerr<<"Invalid operands for <"<<std::endl;
+                exit(1);
             case GREATER_EQUAL:
-                return left >= right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue >= right.intValue);
+                }
+                std::cerr<<"Invalid operands for >="<<std::endl;
+                exit(1);
             case LESS_EQUAL:
-                return left <= right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue <= right.intValue);
+                }
+                std::cerr<<"Invalid operands for <="<<std::endl;
+                exit(1);
             case EQUAL_EQUAL:
-                return left == right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue == right.intValue);
+                }
+                if(left.type == Value::STRING && right.type == Value::STRING){
+                    return Value(left.stringValue == right.stringValue);
+                }
+                std::cerr<<"Invalid operands for =="<<std::endl;
+                exit(1);
             case NOT_EQUAL:
-                return left != right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue != right.intValue);
+                }
+                if(left.type == Value::STRING && right.type == Value::STRING){
+                    return Value(left.stringValue != right.stringValue);
+                }
+                std::cerr<<"Invalid operands for !="<<std::endl;
+                exit(1);
             case AND_AND:
-                return left && right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue && right.intValue);
+                }
+                std::cerr<<"Invalid operands for &&"<<std::endl;
+                exit(1);
             case OR_OR:
-                return left || right;
+                if(left.type == Value::INT && right.type == Value::INT){
+                    return Value(left.intValue || right.intValue);
+                }
+                std::cerr<<"Invalid operands for ||"<<std::endl;
+                exit(1);
             default:
                 std::cerr<<"Unknown operator!"<<std::endl;
                 exit(1);
