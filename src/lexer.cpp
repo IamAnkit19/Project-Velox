@@ -187,6 +187,33 @@ Token Lexer::getNextToken(){
                 return Token(OR_OR, "||");
             }
         }
+        // Single Line Comment
+        if(currentChar == '/' && peek() == '/'){
+            while(currentChar != '\n' && currentChar != '\0'){
+                advance();
+            }
+            continue;
+        }
+        // Multi Line Comment
+        if(currentChar == '/' && peek() == '*'){
+            advance();
+            advance();
+            bool closed = false;
+            while(currentChar != '\0'){
+                if(currentChar == '*' && peek() == '/'){
+                    advance();
+                    advance();
+                    closed = true;
+                    break;
+                }
+                advance();
+            }
+            if(!closed){
+                std::cerr<<"Undetermined Multiline Comment!"<<std::endl;
+                exit(1);
+            }
+            continue;
+        }
 
         std::cerr<<"Error: Invalid Character -> "<<currentChar<<std::endl;
         exit(1);
