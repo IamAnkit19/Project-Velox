@@ -48,10 +48,12 @@ class BinaryOpNode : public ASTNode{
 class VarAssignNode : public ASTNode{
     public:
     std::string varName;
+    std::string varType;
     ASTNode *value;
     bool isDeclaration;
-    VarAssignNode(std::string n, ASTNode *v, bool decl){
+    VarAssignNode(std::string n, std::string t, ASTNode *v, bool decl){
         varName = n;
+        varType = t;
         value = v;
         isDeclaration = decl;
     }

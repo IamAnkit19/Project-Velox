@@ -40,6 +40,9 @@ Token Lexer::identifier(){
     if(result == "int"){
         return Token(INT, result);
     }
+    if(result == "string"){
+        return Token(STRING_TYPE, result);
+    }
     else if(result == "print"){
         return Token(PRINT, result);
     }
@@ -121,6 +124,33 @@ Token Lexer::getNextToken(){
         if(currentChar == '*'){
             advance();
             return Token(MULTIPLY, "*");
+        }
+        // Single Line Comment
+        if(currentChar == '/' && peek() == '/'){
+            while(currentChar != '\n' && currentChar != '\0'){
+                advance();
+            }
+            continue;
+        }
+        // Multi Line Comment
+        if(currentChar == '/' && peek() == '*'){
+            advance();
+            advance();
+            bool closed = false;
+            while(currentChar != '\0'){
+                if(currentChar == '*' && peek() == '/'){
+                    advance();
+                    advance();
+                    closed = true;
+                    break;
+                }
+                advance();
+            }
+            if(!closed){
+                std::cerr<<"Undetermined Multiline Comment!"<<std::endl;
+                exit(1);
+            }
+            continue;
         }
         if(currentChar == '/'){
             advance();
@@ -204,33 +234,6 @@ Token Lexer::getNextToken(){
                 advance();
                 return Token(OR_OR, "||");
             }
-        }
-        // Single Line Comment
-        if(currentChar == '/' && peek() == '/'){
-            while(currentChar != '\n' && currentChar != '\0'){
-                advance();
-            }
-            continue;
-        }
-        // Multi Line Comment
-        if(currentChar == '/' && peek() == '*'){
-            advance();
-            advance();
-            bool closed = false;
-            while(currentChar != '\0'){
-                if(currentChar == '*' && peek() == '/'){
-                    advance();
-                    advance();
-                    closed = true;
-                    break;
-                }
-                advance();
-            }
-            if(!closed){
-                std::cerr<<"Undetermined Multiline Comment!"<<std::endl;
-                exit(1);
-            }
-            continue;
         }
 
         std::cerr<<"Error: Invalid Character -> "<<currentChar<<std::endl;

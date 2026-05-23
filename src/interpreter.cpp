@@ -128,6 +128,22 @@ Value Interpreter::visit(ASTNode *node){
     }
     // Function Call
     if(FunctionCallNode *call = dynamic_cast<FunctionCallNode*>(node)){
+        if(call->name == "input"){
+            std::string input;
+            std::getline(std::cin, input);
+            // Check for number
+            bool isNumber = true;
+            for(char c : input){
+                if(!isdigit(c)){
+                    isNumber = false;
+                    break;
+                }
+            }
+            if(isNumber){
+                return Value(std::stoi(input));
+            }
+            return Value(input);
+        }
         if(functions.find(call->name) == functions.end()){
             std::cerr<<"Undefinded Function: "<<call->name<<std::endl;
             exit(1);

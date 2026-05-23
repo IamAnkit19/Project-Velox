@@ -206,14 +206,15 @@ ASTNode *Parser::statement(){
         eat(SEMICOLON);
         return new ReturnNode(value);
     }
-    if(currentToken.type == INT){
-        eat(INT);
+    if(currentToken.type == INT || currentToken.type == STRING_TYPE){
+        Token tokenType = currentToken;
+        eat(tokenType.type);
         Token varToken = currentToken;
         eat(IDENTIFIER);
         eat(ASSIGN);
         ASTNode *value = logicalOR();
         eat(SEMICOLON);
-        return new VarAssignNode(varToken.value, value, true);
+        return new VarAssignNode(varToken.value, tokenType.value, value, true);
     }
     if(currentToken.type == PRINT){
         eat(PRINT);
@@ -229,7 +230,7 @@ ASTNode *Parser::statement(){
         eat(ASSIGN);
         ASTNode *value = logicalOR();
         eat(SEMICOLON);
-        return new VarAssignNode(varToken.value, value, false);
+        return new VarAssignNode(varToken.value, "", value, false);
     }
     ASTNode *node = logicalOR();
     eat(SEMICOLON);

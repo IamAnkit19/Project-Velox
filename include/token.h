@@ -6,6 +6,7 @@
 enum TokenType{
     // Keywords
     INT,
+    STRING_TYPE,
     PRINT,
     IF,
     WHILE,
@@ -69,6 +70,7 @@ struct Token{
     std::string toString(){
         switch(type){
             case INT: return "INT";
+            case STRING_TYPE: return "STRING_TYPE";
             case PRINT: return "PRINT";
             case IF: return "IF";
             case WHILE: return "WHILE";
