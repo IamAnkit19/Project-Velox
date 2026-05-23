@@ -157,7 +157,7 @@ Value Interpreter::visit(ASTNode *node){
         scopes.push_back({});
         for(int i=0; i<func->params.size(); i++){
             Value value = visit(call->arguments[i]);
-            scopes.back()[func->params[i]] = value;
+            scopes.back()[func->params[i]] = Variable("dynamic", value);
         }
         returnFlag = false;
         returnValue = Value(0);
@@ -177,13 +177,30 @@ Value Interpreter::visit(ASTNode *node){
                 std::cerr<<"Variable already declared: "<<assign->varName<<std::endl;
                 exit(1);
             }
-            scopes.back()[assign->varName] = value;
+            if(assign->varType == "int" && value.type != Value::INT){
+                std::cerr<<"Type Error: Expected int"<<std::endl;
+                exit(1);
+            }
+            if(assign->varType == "string" && value.type != Value::STRING){
+                std::cerr<<"Type Error: Expected string"<<std::endl;
+                exit(1);
+            }
+            scopes.back()[assign->varName] = Variable(assign->varType, value);
             return value;
         }
         // Variable Reassignment
         for(int i=scopes.size()-1; i>=0; i--){
             if(scopes[i].find(assign->varName) != scopes[i].end()){
-                scopes[i][assign->varName] = value;
+                Variable &var = scopes[i][assign->varName];
+                if(var.type == "int" && value.type != Value::INT){
+                    std::cerr<<"Type Error: Expected int"<<std::endl;
+                    exit(1);
+                }
+                if(var.type == "string" && value.type != Value::STRING){
+                    std::cerr<<"Type Error: Expected string"<<std::endl;
+                    exit(1);
+                }
+                var.value = value;
                 return value;
             }
         }
@@ -194,7 +211,7 @@ Value Interpreter::visit(ASTNode *node){
     if(VariableNode *var = dynamic_cast<VariableNode*>(node)){
         for(int i=scopes.size()-1; i>=0; i--){
             if(scopes[i].find(var->name) != scopes[i].end()){
-                return scopes[i][var->name];
+                return scopes[i][var->name].value;
             }
         }
         std::cerr<<"Undefined Varibale: "<<var->name<<std::endl;

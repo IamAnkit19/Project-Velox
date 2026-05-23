@@ -3,6 +3,7 @@
 
 #include "ast.h"
 #include "value.h"
+#include "variable.h"
 #include<map>
 #include<string>
 #include<vector>
@@ -13,7 +14,7 @@ public:
     bool continueFlag = false;
     bool returnFlag = false;
     Value returnValue = Value(0);
-    std::vector<std::map<std::string, Value>> scopes;
+    std::vector<std::map<std::string, Variable>> scopes;
     std::map<std::string, FunctionDefNode*> functions;
     Interpreter();
     Value visit(ASTNode *node);
