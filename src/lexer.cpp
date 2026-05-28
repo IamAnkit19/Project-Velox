@@ -86,7 +86,27 @@ Token Lexer::string(){
     std::string result = "";
     advance();
     while(currentChar != '"' && currentChar != '\0'){
-        result += currentChar;
+        if(currentChar == '\\'){
+            advance();
+            if(currentChar == 'n'){
+                result += '\n';
+            }
+            else if(currentChar == 't'){
+                result += '\t';
+            }
+            else if(currentChar == '"'){
+                result += '"';
+            }
+            else if(currentChar == '\\'){
+                result += '\\';
+            }
+            else{
+                result += currentChar;
+            }
+        }
+        else{
+            result += currentChar;
+        }
         advance();
     }
     if(currentChar == '\0'){
