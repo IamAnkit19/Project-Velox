@@ -1,1 +1,12 @@
-print("C:\\Users");
+func sum(a, b){
+    return a + b;
+}
+
+print("Enter a: ");
+int a = input();
+
+print("Enter b: ");
+int b = input();
+
+print("Sum: ");
+print(sum(a, b));
