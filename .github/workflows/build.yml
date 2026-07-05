@@ -2,48 +2,44 @@ name: Build Velox
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  windows:
-    runs-on: windows-latest
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest,windows-latest]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup MSYS2
+        if: matrix.os=='windows-latest'
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
           update: true
           install: mingw-w64-x86_64-gcc
 
+      - name: Install GCC
+        if: matrix.os=='ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y g++
+
       - name: Build Windows
+        if: matrix.os=='windows-latest'
         shell: msys2 {0}
         run: |
           mkdir -p build
           g++ src/*.cpp -Iinclude -O2 -o build/velox.exe
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: velox-windows
-          path: build/velox.exe
-
-  linux:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Compiler
-        run: sudo apt-get update && sudo apt-get install -y g++
-
       - name: Build Linux
+        if: matrix.os=='ubuntu-latest'
         run: |
           mkdir -p build
           g++ src/*.cpp -Iinclude -O2 -o build/velox
@@ -51,5 +47,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: velox-linux
-          path: build/velox
+          name: ${{ matrix.os }}
+          path: build/*
