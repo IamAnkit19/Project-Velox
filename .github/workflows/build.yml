@@ -2,7 +2,10 @@ name: Build Velox
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+    tags:
+      - "v*"
   workflow_dispatch:
 
 permissions:
@@ -49,3 +52,26 @@ jobs:
         with:
           name: ${{ matrix.os }}
           path: build/*
+
+  release:
+    needs: build
+    if: startsWith(github.ref,'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare Release Files
+        run: |
+          mkdir release
+          cp artifacts/windows-latest/velox.exe release/velox.exe
+          cp artifacts/ubuntu-latest/velox release/velox
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/velox.exe
+            release/velox
