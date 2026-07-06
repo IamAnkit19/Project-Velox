@@ -119,7 +119,7 @@ Token Lexer::string(){
 
 Token Lexer::getNextToken(){
     while(currentChar != '\0'){
-        if(currentChar == ' ' || currentChar == '\t' || currentChar == '\n'){
+        if(currentChar == ' ' || currentChar == '\t' || currentChar == '\n' || currentChar == '\r'){
             skipWhitespace();
             continue;
         }
