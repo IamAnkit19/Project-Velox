@@ -15,7 +15,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest,windows-latest]
+        os: [ubuntu-22.04,windows-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -31,7 +31,7 @@ jobs:
           install: mingw-w64-x86_64-gcc
 
       - name: Install GCC
-        if: matrix.os=='ubuntu-latest'
+        if: matrix.os=='ubuntu-22.04'
         run: sudo apt-get update && sudo apt-get install -y g++
 
       - name: Build Windows
@@ -42,10 +42,10 @@ jobs:
           g++ src/*.cpp -Iinclude -O2 -o build/velox.exe
 
       - name: Build Linux
-        if: matrix.os=='ubuntu-latest'
+        if: matrix.os=='ubuntu-22.04'
         run: |
           mkdir -p build
-          g++ src/*.cpp -Iinclude -O2 -o build/velox
+          g++ src/*.cpp -Iinclude -O2 -static-libstdc++ -static-libgcc -s -o build/velox
           chmod +x build/velox
 
       - uses: actions/upload-artifact@v4
@@ -67,7 +67,7 @@ jobs:
         run: |
           mkdir release
           cp artifacts/windows-latest/velox.exe release/velox.exe
-          cp artifacts/ubuntu-latest/velox release/velox
+          cp artifacts/ubuntu-22.04/velox release/velox
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
