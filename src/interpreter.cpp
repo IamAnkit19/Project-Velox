@@ -132,9 +132,9 @@ Value Interpreter::visit(ASTNode *node){
             std::string input;
             std::getline(std::cin, input);
             // Check for number
-            bool isNumber = true;
+            bool isNumber = !input.empty();
             for(char c : input){
-                if(!isdigit(c)){
+                if(!isdigit(static_cast<unsigned char>(c))){
                     isNumber = false;
                     break;
                 }

@@ -26,7 +26,7 @@ void Lexer::advance(){
 }
 
 void Lexer::skipWhitespace(){
-    while(currentChar == ' ' || currentChar == '\t' || currentChar == '\n'){
+    while(currentChar == ' ' || currentChar == '\t' || currentChar == '\n' || currentChar == '\r'){
         advance();
     }
 }
